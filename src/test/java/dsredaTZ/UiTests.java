@@ -1,14 +1,20 @@
 package dsredaTZ;
 
 import com.codeborne.selenide.Configuration;
+import com.codeborne.xlstest.XLS;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.*;
 import org.openqa.selenium.By;
+
+import java.io.File;
+import java.time.Duration;
 
 import static com.codeborne.selenide.Condition.text;
 import static com.codeborne.selenide.Condition.visible;
 import static com.codeborne.selenide.Selenide.*;
 import static io.qameta.allure.Allure.step;
+import static org.assertj.core.api.Assertions.assertThat;
+
 
 @Tag("UI")
 public class UiTests {
@@ -22,7 +28,7 @@ public class UiTests {
 
 
     @Test
-    @DisplayName("Проверка отправки электронного обращения в электронной приемной Администрации г.Магнитогорска")
+    @DisplayName("Проверка отправки обращения в интернет-приемной Администрации г.Магнитогорска")
     void checkAppealSending() {
 
         step("Открываем сайт Администрации г.Магнитогорска в разделе 'Интернет приемная'", () -> {
@@ -103,13 +109,13 @@ public class UiTests {
         });
 
         step("Убедиться что появилось сообщение об успешной отправке обращения", () -> {
-            $(By.xpath("//div[@class='swal-text']")).shouldBe(visible).shouldHave(text("Ваше обращение успешно отправлено"));
+            $(By.xpath("//div[@class='swal-text']")).shouldBe(visible, Duration.ofSeconds(10)).shouldHave(text("Ваше обращение успешно отправлено"));
         });
     }
 
     @Test
     @DisplayName("Проверка xls файла формы аккредитации журналистов")
-    void checkAccreditationFile() {
+    void checkAccreditationFile() throws Exception{
 
         step("Открываем сайт Администрации г.Магнитогорска", () -> {
             open("https://www.magnitogorsk.ru/");
@@ -129,6 +135,46 @@ public class UiTests {
 
         step("Открываем статью 'Журналисты, готовимся к этапу Кубка мира по сноуборду в Магнитогорске'", () -> {
             $(By.xpath("//a[@href='https://www.magnitogorsk.ru/news/zhurnalisty-gotovimsya-k-etapu-kubka-mira-po-snoubordu-v-magnitogorske']")).click();
+        });
+
+        step("Скачиваем xls файл формы аккредитации и проверяем его", () -> {
+           File xlsFile = $(By.xpath("//a[@href='/storage/app/media/.old_news/2019/forma_dlya_akkreditacii_1.xls']")).download();
+            XLS xls = new XLS(xlsFile);
+
+            assertThat(
+                    xls.excel.getSheetAt(0)
+                            .getRow(1)
+                            .getCell(3)
+                            .getStringCellValue()
+            ).contains("Фамилия");
+
+            assertThat(
+                    xls.excel.getSheetAt(0)
+                            .getRow(1)
+                            .getCell(4)
+                            .getStringCellValue()
+            ).contains("Имя");
+
+            assertThat(
+                    xls.excel.getSheetAt(0)
+                            .getRow(1)
+                            .getCell(5)
+                            .getStringCellValue()
+            ).contains("Отчество");
+
+            assertThat(
+                    xls.excel.getSheetAt(0)
+                            .getRow(1)
+                            .getCell(6)
+                            .getStringCellValue()
+            ).contains("Организация");
+
+            assertThat(
+                    xls.excel.getSheetAt(0)
+                            .getRow(5)
+                            .getCell(14)
+                            .getStringCellValue()
+            ).contains("Паспортные данные");
         });
 
     }

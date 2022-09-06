@@ -24,6 +24,7 @@ dependencies {
     implementation 'io.qameta.allure:allure-assertj:2.12.1'
     implementation 'io.qameta.allure:allure-selenide:2.12.1'
     implementation 'com.codeborne:xls-test:1.4.3'
+    implementation 'org.assertj:assertj-core:3.23.1'
 }
 
 def apiTest = tasks.register("apiTests", Test) {
@@ -40,4 +41,6 @@ def uiTest = tasks.register("uiTests", Test) {
 
 test {
     useJUnitPlatform()
+    systemProperty "file.encoding", "utf-8"
+    systemProperty "file.encoding", "windows-1252"
 }
