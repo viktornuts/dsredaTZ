@@ -5,6 +5,7 @@ plugins {
 
 group 'org.example'
 version '1.0-SNAPSHOT'
+compileJava.options.encoding = 'UTF-8'
 
 repositories {
     mavenCentral()
@@ -17,12 +18,6 @@ dependencies {
     testImplementation 'com.fasterxml.jackson.core:jackson-databind:2.13.2'
     testImplementation 'com.codeborne:selenide:6.5.0'
 
-    implementation 'io.qameta.allure:allure-java-commons:2.12.1'
-    implementation 'io.qameta.allure:allure-commandline:2.12.1'
-    implementation 'io.qameta.allure:allure-rest-assured:2.12.1'
-    implementation 'io.qameta.allure:allure-junit5:2.12.1'
-    implementation 'io.qameta.allure:allure-assertj:2.12.1'
-    implementation 'io.qameta.allure:allure-selenide:2.12.1'
     implementation 'com.codeborne:xls-test:1.4.3'
     implementation 'org.assertj:assertj-core:3.23.1'
 }
@@ -31,12 +26,22 @@ def apiTest = tasks.register("apiTests", Test) {
     useJUnitPlatform {
         includeTags "API"
     }
+    testLogging { events "passed", "skipped", "failed" }
 }
 
 def uiTest = tasks.register("uiTests", Test) {
     useJUnitPlatform {
         includeTags "UI"
     }
+    testLogging { events "passed", "skipped", "failed" }
+}
+
+def fullTest = tasks.register("fullTests", Test) {
+    useJUnitPlatform {
+        includeTags "UI"
+        includeTags "API"
+    }
+    testLogging { events "passed", "skipped", "failed" }
 }
 
 test {
@@ -44,3 +49,5 @@ test {
     systemProperty "file.encoding", "utf-8"
     systemProperty "file.encoding", "windows-1252"
 }
+
+

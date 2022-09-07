@@ -2,12 +2,15 @@ package dsredaTZ;
 
 import com.codeborne.selenide.Configuration;
 import com.codeborne.xlstest.XLS;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
 
 import java.io.File;
 import java.time.Duration;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static com.codeborne.selenide.Condition.text;
 import static com.codeborne.selenide.Condition.visible;
@@ -20,7 +23,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class UiTests {
 
     @BeforeAll
-    public static void setUp(){
+    public static void setUp() {
         Configuration.headless = false;
         Configuration.browser = "Chrome";
         Configuration.browserSize = "1800x900";
@@ -115,7 +118,7 @@ public class UiTests {
 
     @Test
     @DisplayName("Проверка xls файла формы аккредитации журналистов")
-    void checkAccreditationFile() throws Exception{
+    void checkAccreditationFile() throws Exception {
 
         step("Открываем сайт Администрации г.Магнитогорска", () -> {
             open("https://www.magnitogorsk.ru/");
@@ -137,9 +140,14 @@ public class UiTests {
             $(By.xpath("//a[@href='https://www.magnitogorsk.ru/news/zhurnalisty-gotovimsya-k-etapu-kubka-mira-po-snoubordu-v-magnitogorske']")).click();
         });
 
-        step("Скачиваем xls файл формы аккредитации и проверяем его", () -> {
-           File xlsFile = $(By.xpath("//a[@href='/storage/app/media/.old_news/2019/forma_dlya_akkreditacii_1.xls']")).download();
-            XLS xls = new XLS(xlsFile);
+        AtomicReference<File> xlsFile2 = new AtomicReference<>(null);
+
+        step("Скачиваем xls файл формы аккредитации", () -> {
+            xlsFile2.set($(By.xpath("//a[@href='/storage/app/media/.old_news/2019/forma_dlya_akkreditacii_1.xls']")).download());
+        });
+
+        step("Проверяем xls файл формы аккредитации", () -> {
+            XLS xls = new XLS(xlsFile2.get());
 
             assertThat(
                     xls.excel.getSheetAt(0)
