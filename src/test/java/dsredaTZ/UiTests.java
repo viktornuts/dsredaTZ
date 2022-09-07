@@ -184,8 +184,5 @@ public class UiTests {
                             .getStringCellValue()
             ).contains("Паспортные данные");
         });
-
     }
-
-
 }
